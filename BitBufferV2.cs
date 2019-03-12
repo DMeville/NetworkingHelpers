@@ -1,4 +1,4 @@
-/*
+﻿/*
  *  Copyright (c) 2019 Stanislav Denisov, Maxim Munnig Schmidt
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -97,9 +97,11 @@ namespace NetStack.Serialization {
             }
         }
 
-#if NETSTACK_INLINING
+        public bool WouldOverflow(int bits) {
+            return bitsRead + bits > totalNumBits;
+        }
+        
         [MethodImpl(256)]
-#endif
         public void Clear() {
             bitsRead = 0;
             bitsWriten = 0;
