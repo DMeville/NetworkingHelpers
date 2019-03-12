@@ -1,4 +1,4 @@
-﻿/*
+/*
  *  Copyright (c) 2019 Stanislav Denisov, Maxim Munnig Schmidt
  *
  *  Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -155,7 +155,8 @@ namespace NetStack.Serialization {
             Debug.Assert(scratchUsedBits >= 0 && scratchUsedBits <= 64, "Too many bits used in scratch, Overflow?");
 
             if (scratchUsedBits < numBits) {
-                Debug.Assert(chunkIndex < totalNumChunks, "reading more than buffer size");
+                if (chunkIndex >= totalNumChunks) throw new ArgumentOutOfRangeException("reading more than buffer size");
+
                 scratch |= ((ulong)(chunks[chunkIndex])) << scratchUsedBits;
                 scratchUsedBits += 32;
                 chunkIndex++;
@@ -171,6 +172,9 @@ namespace NetStack.Serialization {
             return output;
         }
 
+#if NETSTACK_INLINING
+        [MethodImpl(256)]
+#endif
         public void Finish() {
             if (scratchUsedBits != 0) {
                 Debug.Assert(chunkIndex < totalNumChunks, "buffer overflow when trying to finalize stream");
@@ -244,65 +248,65 @@ namespace NetStack.Serialization {
         }
 
 #if NETSTACK_SPAN
-			public int ToSpan(ref Span<byte> data) {
-				Add(1, 1);
+		public int ToSpan(ref Span<byte> data) {
+			Add(1, 1);
 
-				int numChunks = (bitsWriten >> 5) + 1;
-				int length = data.Length;
+			int numChunks = (bitsWriten >> 5) + 1;
+			int length = data.Length;
 
-				for (int i = 0; i < numChunks; i++) {
-					int dataIdx = i * 4;
-					uint chunk = chunks[i];
+			for (int i = 0; i < numChunks; i++) {
+				int dataIdx = i * 4;
+				uint chunk = chunks[i];
 
-					if (dataIdx < length)
-						data[dataIdx] = (byte)(chunk);
+				if (dataIdx < length)
+					data[dataIdx] = (byte)(chunk);
 
-					if (dataIdx + 1 < length)
-						data[dataIdx + 1] = (byte)(chunk >> 8);
+				if (dataIdx + 1 < length)
+					data[dataIdx + 1] = (byte)(chunk >> 8);
 
-					if (dataIdx + 2 < length)
-						data[dataIdx + 2] = (byte)(chunk >> 16);
+				if (dataIdx + 2 < length)
+					data[dataIdx + 2] = (byte)(chunk >> 16);
 
-					if (dataIdx + 3 < length)
-						data[dataIdx + 3] = (byte)(chunk >> 24);
-				}
-
-				return Length;
+				if (dataIdx + 3 < length)
+					data[dataIdx + 3] = (byte)(chunk >> 24);
 			}
 
-			public void FromSpan(ref ReadOnlySpan<byte> data, int length) {
-				int numChunks = (length / 4) + 1;
+			return Length;
+		}
 
-				if (chunks.Length < numChunks) {
-                    chunks = new uint[numChunks];
-                    totalNumChunks = numChunks;// / 4;
-                    totalNumBits = numChunks * 32;
-                }
+		public void FromSpan(ref ReadOnlySpan<byte> data, int length) {
+			int numChunks = (length / 4) + 1;
 
-				for (int i = 0; i < numChunks; i++) {
-					int dataIdx = i * 4;
-					uint chunk = 0;
+			if (chunks.Length < numChunks) {
+                chunks = new uint[numChunks];
+                totalNumChunks = numChunks;// / 4;
+                totalNumBits = numChunks * 32;
+            }
 
-					if (dataIdx < length)
-						chunk = (uint)data[dataIdx];
+			for (int i = 0; i < numChunks; i++) {
+				int dataIdx = i * 4;
+				uint chunk = 0;
 
-					if (dataIdx + 1 < length)
- 						chunk = chunk | (uint)data[dataIdx + 1] << 8;
+				if (dataIdx < length)
+					chunk = (uint)data[dataIdx];
 
-					if (dataIdx + 2 < length)
-						chunk = chunk | (uint)data[dataIdx + 2] << 16;
+				if (dataIdx + 1 < length)
+ 					chunk = chunk | (uint)data[dataIdx + 1] << 8;
 
-					if (dataIdx + 3 < length)
-						chunk = chunk | (uint)data[dataIdx + 3] << 24;
+				if (dataIdx + 2 < length)
+					chunk = chunk | (uint)data[dataIdx + 2] << 16;
 
-					chunks[i] = chunk;
-				}
+				if (dataIdx + 3 < length)
+					chunk = chunk | (uint)data[dataIdx + 3] << 24;
 
-				int positionInByte = FindHighestBitPosition(data[length - 1]);
-
-				bitsWriten = ((length - 1) * 8) + (positionInByte - 1);
-				bitsRead = 0;
+				chunks[i] = chunk;
 			}
+
+			int positionInByte = FindHighestBitPosition(data[length - 1]);
+
+			bitsWriten = ((length - 1) * 8) + (positionInByte - 1);
+			bitsRead = 0;
+		}
 #endif
 
 #if NETSTACK_INLINING
