@@ -37,8 +37,6 @@
  *     misrepresented as being the original software.
  *  3. This notice may not be removed or altered from any source distribution.
  */
-#define NETSTACK_INLINING
-
 using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
@@ -110,10 +108,8 @@ namespace NetStack.Serialization {
             scratch = 0;
             scratchUsedBits = 0;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public void Add(int numBits, uint value) {
             Debug.Assert(numBits > 0, "Pushing negative bits");
             Debug.Assert(numBits <= 32, "Pushing too many bits");
@@ -134,10 +130,8 @@ namespace NetStack.Serialization {
 
             bitsWriten += numBits;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint Read(int numBits) {
             uint result = Peek(numBits);
 
@@ -145,10 +139,8 @@ namespace NetStack.Serialization {
 
             return result;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint Peek(int numBits) {
             Debug.Assert(numBits > 0, "reading negative bits");
             Debug.Assert(numBits <= 32, "reading too many bits");
@@ -173,10 +165,8 @@ namespace NetStack.Serialization {
 
             return output;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public void Finish() {
             if (scratchUsedBits != 0) {
                 Debug.Assert(chunkIndex < totalNumChunks, "buffer overflow when trying to finalize stream");
@@ -310,171 +300,127 @@ namespace NetStack.Serialization {
 			bitsRead = 0;
 		}
 #endif
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddBool(bool value) {
             Add(1, value ? 1U : 0U);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public bool ReadBool() {
             return Read(1) > 0;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public bool PeekBool() {
             return Peek(1) > 0;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddByte(byte value) {
             Add(8, value);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddByte(byte value, byte min, byte max) {
             AddUInt(value, min, max);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public byte ReadByte() {
             return (byte)Read(8);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public byte ReadByte(byte min, byte max) {
             return (byte)ReadUInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public byte PeekByte() {
             return (byte)Peek(8);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public byte PeekByte(byte min, byte max) {
             return (byte)PeekUInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddShort(short value) {
             AddInt(value);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddShort(short value, short min, short max) {
             AddInt(value, min, max);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public short ReadShort() {
             return (short)ReadInt();
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public short ReadShort(short min, short max) {
             return (short)ReadInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public short PeekShort() {
             return (short)PeekInt();
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public short PeekShort(short min, short max) {
             return (short)PeekInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddUShort(ushort value) {
             AddUInt(value);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddUShort(ushort value, ushort min, ushort max) {
             AddUInt(value, min, max);
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ushort ReadUShort() {
             return (ushort)ReadUInt();
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ushort ReadUShort(ushort min, ushort max) {
             return (ushort)ReadUInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ushort PeekUShort() {
             return (ushort)PeekUInt();
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ushort PeekUShort(ushort min, ushort max) {
             return (ushort)PeekUInt(min, max);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddInt(int value) {
             uint zigzag = (uint)((value << 1) ^ (value >> 31));
 
@@ -482,10 +428,8 @@ namespace NetStack.Serialization {
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddInt(int value, int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
             Debug.Assert(value >= min, "value is lower than minimal");
@@ -495,20 +439,16 @@ namespace NetStack.Serialization {
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public int ReadInt() {
             uint value = ReadUInt();
             int zagzig = (int)((value >> 1) ^ (-(int)(value & 1)));
 
             return zagzig;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public int ReadInt(int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
 
@@ -517,20 +457,16 @@ namespace NetStack.Serialization {
 
             return (int)(Read(bits) + min);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public int PeekInt() {
             uint value = PeekUInt();
             int zagzig = (int)((value >> 1) ^ (-(int)(value & 1)));
 
             return zagzig;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public int PeekInt(int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
 
@@ -539,10 +475,8 @@ namespace NetStack.Serialization {
 
             return (int)(Peek(bits) + min);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddUInt(uint value) {
             do {
                 var buffer = value & 0x7Fu;
@@ -557,10 +491,8 @@ namespace NetStack.Serialization {
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddUInt(uint value, uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
             Debug.Assert(value >= min, "value is lower than minimal");
@@ -570,10 +502,8 @@ namespace NetStack.Serialization {
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint ReadUInt() {
             uint buffer = 0x0u;
             uint value = 0x0u;
@@ -589,10 +519,8 @@ namespace NetStack.Serialization {
 
             return value;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint ReadUInt(uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
 
@@ -601,10 +529,8 @@ namespace NetStack.Serialization {
 
             return (Read(bits) + min);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint PeekUInt() {
             int tempPosition = bitsRead;
             uint value = ReadUInt();
@@ -613,10 +539,8 @@ namespace NetStack.Serialization {
 
             return value;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public uint PeekUInt(uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
 
@@ -625,20 +549,16 @@ namespace NetStack.Serialization {
 
             return (Peek(bits) + min);
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddLong(long value) {
             AddInt((int)(value & uint.MaxValue));
             AddInt((int)(value >> 32));
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public long ReadLong() {
             int low = ReadInt();
             int high = ReadInt();
@@ -646,10 +566,8 @@ namespace NetStack.Serialization {
 
             return value << 32 | (uint)low;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public long PeekLong() {
             int tempPosition = bitsRead;
             long value = ReadLong();
@@ -658,30 +576,24 @@ namespace NetStack.Serialization {
 
             return value;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddULong(ulong value) {
             AddUInt((uint)(value & uint.MaxValue));
             AddUInt((uint)(value >> 32));
 
             return this;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ulong ReadULong() {
             uint low = ReadUInt();
             uint high = ReadUInt();
 
             return (ulong)high << 32 | low;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public ulong PeekULong() {
             int tempPosition = bitsRead;
             ulong value = ReadULong();
@@ -690,10 +602,8 @@ namespace NetStack.Serialization {
 
             return value;
         }
-
-#if NETSTACK_INLINING
+        
         [MethodImpl(256)]
-#endif
         public BitBufferV2 AddString(string value) {
             if (value == null)
                 throw new ArgumentNullException("value");
@@ -746,9 +656,8 @@ namespace NetStack.Serialization {
         }
 
         private StringBuilder builder = new StringBuilder(stringLengthMax);
-#if NETSTACK_INLINING
+
         [MethodImpl(256)]
-#endif
         public string ReadString() {
             builder.Clear();
 
