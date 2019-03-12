@@ -149,7 +149,7 @@ namespace NetStack.Serialization {
             Debug.Assert(scratchUsedBits >= 0 && scratchUsedBits <= 64, "Too many bits used in scratch, Overflow?");
 
             if (scratchUsedBits < numBits) {
-                if (chunkIndex >= totalNumChunks) throw new ArgumentOutOfRangeException("reading more than buffer size");
+                Debug.Assert(chunkIndex < totalNumChunks, "reading more than buffer size");
 
                 scratch |= ((ulong)(chunks[chunkIndex])) << scratchUsedBits;
                 scratchUsedBits += 32;
