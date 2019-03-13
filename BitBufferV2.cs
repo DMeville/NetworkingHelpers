@@ -786,8 +786,9 @@ namespace NetStack.Serialization {
             float maxValue = float.MinValue;
             bool signminus = false;
 
+#if (ENABLE_MONO || ENABLE_IL2CPP)
             var fastAbs = new FastAbs();
-
+#endif
             for (uint quadIndex = 0; quadIndex <= 3; quadIndex++) {
                 float element = 0f;
                 float abs = 0f;
@@ -807,6 +808,7 @@ namespace NetStack.Serialization {
                         element = quaternion.W;
                         break;
                 }
+                abs = Math.Abs(element);
 #else
                 switch (quadIndex) {
                     case 0:
@@ -822,11 +824,11 @@ namespace NetStack.Serialization {
                         element = quaternion.w;
                         break;
                 }
-#endif
                 fastAbs.single = element;
                 fastAbs.uint32 &= 0x7FFFFFFF;
                 abs = fastAbs.single;
-
+#endif
+                
                 if (abs > maxValue) {
                     signminus = (element < 0f);
                     m = quadIndex;
@@ -1062,11 +1064,14 @@ namespace NetStack.Serialization {
         private static int BitsRequired(uint min, uint max) {
             return (min == max) ? 1 : Log2(max - min) + 1;
         }
-        
+
+#if (ENABLE_MONO || ENABLE_IL2CPP)
         [StructLayout(LayoutKind.Explicit)]
         public struct FastAbs {
             [FieldOffset(0)] public uint uint32;
             [FieldOffset(0)] public float single;
         }
+#endif
+
     }
 }
