@@ -45,8 +45,8 @@ using System.Text;
 namespace NetStack.Serialization {
     public class BitBufferV2 {
         private const int defaultCapacity = 375; // 375 * 4 = 1500 bytes default MTU. don't have to grow.
-        private const int stringLengthMax = 512;
-        private const int stringLengthBits = 9;
+        private const int stringLengthMax = 255;
+        private const int stringLengthBits = 8;
         private const int bitsASCII = 7;
         private const int bitsLATIN1 = 8;
         private const int bitsUTF16 = 16;
@@ -324,7 +324,14 @@ namespace NetStack.Serialization {
 
             return this;
         }
-        
+
+        [MethodImpl(256)]
+        public BitBufferV2 AddByte(byte value, int numBits) {
+            AddUInt(value, numBits);
+
+            return this;
+        }
+
         [MethodImpl(256)]
         public BitBufferV2 AddByte(byte value, byte min, byte max) {
             AddUInt(value, min, max);
@@ -336,7 +343,12 @@ namespace NetStack.Serialization {
         public byte ReadByte() {
             return (byte)Read(8);
         }
-        
+
+        [MethodImpl(256)]
+        public byte ReadByte(int numBits) {
+            return (byte)ReadUInt(numBits);
+        }
+
         [MethodImpl(256)]
         public byte ReadByte(byte min, byte max) {
             return (byte)ReadUInt(min, max);
@@ -346,7 +358,12 @@ namespace NetStack.Serialization {
         public byte PeekByte() {
             return (byte)Peek(8);
         }
-        
+
+        [MethodImpl(256)]
+        public byte PeekByte(int numBits) {
+            return (byte)PeekUInt(numBits);
+        }
+
         [MethodImpl(256)]
         public byte PeekByte(byte min, byte max) {
             return (byte)PeekUInt(min, max);
@@ -358,7 +375,14 @@ namespace NetStack.Serialization {
 
             return this;
         }
-        
+
+        [MethodImpl(256)]
+        public BitBufferV2 AddShort(short value, int numBits) {
+            AddInt(value, numBits);
+
+            return this;
+        }
+
         [MethodImpl(256)]
         public BitBufferV2 AddShort(short value, short min, short max) {
             AddInt(value, min, max);
@@ -370,7 +394,12 @@ namespace NetStack.Serialization {
         public short ReadShort() {
             return (short)ReadInt();
         }
-        
+
+        [MethodImpl(256)]
+        public short ReadShort(int numBits) {
+            return (short)ReadInt(numBits);
+        }
+
         [MethodImpl(256)]
         public short ReadShort(short min, short max) {
             return (short)ReadInt(min, max);
@@ -380,7 +409,12 @@ namespace NetStack.Serialization {
         public short PeekShort() {
             return (short)PeekInt();
         }
-        
+
+        [MethodImpl(256)]
+        public short PeekShort(int numBits) {
+            return (short)PeekInt(numBits);
+        }
+
         [MethodImpl(256)]
         public short PeekShort(short min, short max) {
             return (short)PeekInt(min, max);
@@ -392,7 +426,14 @@ namespace NetStack.Serialization {
 
             return this;
         }
-        
+
+        [MethodImpl(256)]
+        public BitBufferV2 AddUShort(ushort value, int numBits) {
+            AddUInt(value, numBits);
+
+            return this;
+        }
+
         [MethodImpl(256)]
         public BitBufferV2 AddUShort(ushort value, ushort min, ushort max) {
             AddUInt(value, min, max);
@@ -404,7 +445,12 @@ namespace NetStack.Serialization {
         public ushort ReadUShort() {
             return (ushort)ReadUInt();
         }
-        
+
+        [MethodImpl(256)]
+        public ushort ReadUShort(int numBits) {
+            return (ushort)ReadUInt(numBits);
+        }
+
         [MethodImpl(256)]
         public ushort ReadUShort(ushort min, ushort max) {
             return (ushort)ReadUInt(min, max);
@@ -414,7 +460,12 @@ namespace NetStack.Serialization {
         public ushort PeekUShort() {
             return (ushort)PeekUInt();
         }
-        
+
+        [MethodImpl(256)]
+        public ushort PeekUShort(int numBits) {
+            return (ushort)PeekUInt(numBits);
+        }
+
         [MethodImpl(256)]
         public ushort PeekUShort(ushort min, ushort max) {
             return (ushort)PeekUInt(min, max);
@@ -428,7 +479,16 @@ namespace NetStack.Serialization {
 
             return this;
         }
-        
+
+        [MethodImpl(256)]
+        public BitBufferV2 AddInt(int value, int numBits) {
+            uint zigzag = (uint)((value << 1) ^ (value >> 31));
+
+            Add(numBits, zigzag);
+
+            return this;
+        }
+
         [MethodImpl(256)]
         public BitBufferV2 AddInt(int value, int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -447,7 +507,15 @@ namespace NetStack.Serialization {
 
             return zagzig;
         }
-        
+
+        [MethodImpl(256)]
+        public int ReadInt(int numBits) {
+            uint value = Read(numBits);
+            int zagzig = (int)((value >> 1) ^ (-(int)(value & 1)));
+
+            return zagzig;
+        }
+
         [MethodImpl(256)]
         public int ReadInt(int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -465,7 +533,15 @@ namespace NetStack.Serialization {
 
             return zagzig;
         }
-        
+
+        [MethodImpl(256)]
+        public int PeekInt(int numBits) {
+            uint value = Peek(numBits);
+            int zagzig = (int)((value >> 1) ^ (-(int)(value & 1)));
+
+            return zagzig;
+        }
+
         [MethodImpl(256)]
         public int PeekInt(int min, int max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -491,7 +567,14 @@ namespace NetStack.Serialization {
 
             return this;
         }
-        
+
+        [MethodImpl(256)]
+        public BitBufferV2 AddUInt(uint value, int numBits) {
+            Add(numBits, value);
+
+            return this;
+        }
+
         [MethodImpl(256)]
         public BitBufferV2 AddUInt(uint value, uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -519,7 +602,12 @@ namespace NetStack.Serialization {
 
             return value;
         }
-        
+
+        [MethodImpl(256)]
+        public uint ReadUInt(int numBits){
+            return Read(numBits);
+        }
+
         [MethodImpl(256)]
         public uint ReadUInt(uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -539,7 +627,12 @@ namespace NetStack.Serialization {
 
             return value;
         }
-        
+
+        [MethodImpl(256)]
+        public uint PeekUInt(int numBits) {
+            return Peek(numBits);
+        }
+
         [MethodImpl(256)]
         public uint PeekUInt(uint min, uint max) {
             Debug.Assert(min < max, "minus is not lower than max");
@@ -660,7 +753,7 @@ namespace NetStack.Serialization {
         [MethodImpl(256)]
         public string ReadString() {
             builder.Clear();
-
+            
             uint codePage = Read(2);
             uint length = Read(stringLengthBits);
 
