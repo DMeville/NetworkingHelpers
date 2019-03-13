@@ -1033,21 +1033,26 @@ namespace NetStack.Serialization {
 
             return shiftCount;
         }
-
-        private static readonly int[] DeBruijnLookup = new int[32]
+        
+        private static readonly int[] LogTable256 = new int[256]
         {
-            0, 9, 1, 10, 13, 21, 2, 29, 11, 14, 16, 18, 22, 25, 3, 30,
-            8, 12, 20, 28, 15, 17, 24, 7, 19, 27, 23, 6, 26, 5, 4, 31
+            0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
+            6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6,
+            7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7,
+            7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7
         };
 
-        private static int Log2(uint v) {
-            v |= v >> 1; // Round down to one less than a power of 2 
-            v |= v >> 2;
-            v |= v >> 4;
-            v |= v >> 8;
-            v |= v >> 16;
-
-            return DeBruijnLookup[(v * 0x07C4ACDDU) >> 27];
+        private static int Log2(uint number) {
+            if (number <= 0xffffu) {
+                if (number > 0xffu) {
+                    return 8 + LogTable256[number >> 8];
+                }
+                return LogTable256[number];
+            }
+            if (number <= 0xffffffu) {
+                return 16 + LogTable256[number >> 16];
+            }
+            return 24 + LogTable256[number >> 24];
         }
 
         private static int BitsRequired(int min, int max) {
