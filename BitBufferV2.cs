@@ -242,6 +242,8 @@ namespace NetStack.Serialization {
 #if NETSTACK_SPAN
 		public int ToSpan(ref Span<byte> data) {
 			Add(1, 1);
+        
+            Finish();
 
 			int numChunks = (bitsWriten >> 5) + 1;
 			int length = data.Length;
@@ -300,7 +302,7 @@ namespace NetStack.Serialization {
 			bitsRead = 0;
 		}
 #endif
-        
+
         [MethodImpl(256)]
         public BitBufferV2 AddBool(bool value) {
             Add(1, value ? 1U : 0U);
