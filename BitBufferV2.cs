@@ -872,7 +872,7 @@ namespace NetStack.Serialization {
         }
 
         [MethodImpl(256)]
-        public Quaternion ReadQuaternion(int bitsPerValue) {
+        public Quaternion ReadQuaternion(int bitsPerValue = 12) {
             int halfrange = (1 << bitsPerValue - 1); //  - 1
             float unpacker = SmallestThreeUnpack * (1f / halfrange);
 
@@ -904,7 +904,7 @@ namespace NetStack.Serialization {
         }
 
         [MethodImpl(256)]
-        public Quaternion PeekQuaternion(int bitsPerValue) {
+        public Quaternion PeekQuaternion(int bitsPerValue = 12) {
             var curReadpos = bitsRead;
             var value = ReadQuaternion(bitsPerValue);
 
