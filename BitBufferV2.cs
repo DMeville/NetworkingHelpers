@@ -39,6 +39,7 @@
  */
 using System;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using System.Text;
 #if !(ENABLE_MONO || ENABLE_IL2CPP)
 using System.Diagnostics;
@@ -113,7 +114,7 @@ namespace NetStack.Serialization {
             scratch = 0;
             scratchUsedBits = 0;
         }
-        
+
         [MethodImpl(256)]
         public void Add(int numBits, uint value) {
             Debug.Assert(numBits > 0, "Pushing negative bits");
@@ -784,6 +785,8 @@ namespace NetStack.Serialization {
             float maxValue = float.MinValue;
             bool signminus = false;
 
+            var fastAbs = new FastAbs();
+
             for (uint quadIndex = 0; quadIndex <= 3; quadIndex++) {
                 float element = 0f;
                 float abs = 0f;
@@ -819,7 +822,9 @@ namespace NetStack.Serialization {
                         break;
                 }
 #endif
-                abs = Math.Abs(element);
+                fastAbs.single = element;
+                fastAbs.uint32 &= 0x7FFFFFFF;
+                abs = fastAbs.single;
 
                 if (abs > maxValue) {
                     signminus = (element < 0f);
@@ -1039,6 +1044,12 @@ namespace NetStack.Serialization {
 
         private static int BitsRequired(uint min, uint max) {
             return (min == max) ? 1 : Log2(max - min) + 1;
+        }
+        
+        [StructLayout(LayoutKind.Explicit)]
+        public struct FastAbs {
+            [FieldOffset(0)] public uint uint32;
+            [FieldOffset(0)] public float single;
         }
     }
 }
