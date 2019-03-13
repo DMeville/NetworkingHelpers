@@ -55,6 +55,7 @@ namespace NetStack.Serialization {
         private const int stringLengthBits = 8;
         private const int bitsASCII = 7;
         private const int bitsLATIN1 = 8;
+        private const int bitsLATINEXT = 9;
         private const int bitsUTF16 = 16;
         private int bitsRead;
         private int bitsWriten;
@@ -926,8 +927,11 @@ namespace NetStack.Serialization {
                 if (val > 127) {
                     codePage = 1; // Latin1
                     if (val > 255) {
-                        codePage = 2; // UTF-16
-                        break;
+                        codePage = 2; // LatinExtended 
+                        if (val > 511) {
+                            codePage = 3; // UTF-16
+                            break;
+                        }
                     }
                 }
             }
@@ -938,14 +942,18 @@ namespace NetStack.Serialization {
             if (codePage == 0)
                 for (int i = 0; i < length; i++)
                 {
-                    Add(bitsASCII, (byte) (value[i]));
+                    Add(bitsASCII, value[i]);
                 }
             else if (codePage == 1)
                 for (int i = 0; i < length; i++)
                 {
-                    Add(bitsLATIN1, (byte) (value[i]));
+                    Add(bitsLATIN1, value[i]);
                 }
             else if (codePage == 2)
+                for (int i = 0; i < length; i++) {
+                    Add(bitsLATINEXT, (value[i]));
+                }
+            else if (codePage == 3)
                 for (int i = 0; i < length; i++)
                 {
                     if (value[i] > 127)
@@ -980,7 +988,11 @@ namespace NetStack.Serialization {
                 for (int i = 0; i < length; i++) {
                     builder.Append((char)Read(bitsLATIN1));
                 }
-            else if (codePage == 2) 
+            else if (codePage == 2)
+                for (int i = 0; i < length; i++) {
+                    builder.Append((char)Read(bitsLATINEXT));
+                }
+            else if (codePage == 3) 
                 for (int i = 0; i < length; i++) {
                     var needs16 = Read(1);
                     if (needs16 == 1)
