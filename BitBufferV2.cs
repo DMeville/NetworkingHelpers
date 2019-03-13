@@ -951,7 +951,7 @@ namespace NetStack.Serialization {
                 }
             else if (codePage == 2)
                 for (int i = 0; i < length; i++) {
-                    Add(bitsLATINEXT, (value[i]));
+                    Add(bitsLATINEXT, value[i]);
                 }
             else if (codePage == 3)
                 for (int i = 0; i < length; i++)
@@ -964,7 +964,7 @@ namespace NetStack.Serialization {
                     else
                     {
                         Add(1, 0);
-                        Add(bitsASCII, (byte) (value[i]));
+                        Add(bitsASCII, value[i]);
                     }
                 }
 
