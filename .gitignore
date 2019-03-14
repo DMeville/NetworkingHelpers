@@ -3,3 +3,5 @@ LICENSE.meta
 README.md.meta
 BitBufferV2.cs.meta
 BitBuffer.cs.meta
+HalfPrecision.cs.meta
+Utils.cs.meta
