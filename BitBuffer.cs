@@ -981,8 +981,8 @@ namespace NetHelpers {
 
         [MethodImpl(256)]
         public string ReadString() {
-            builder.Clear();
-            
+            builder.Length = 0;
+
             uint codePage = Read(2);
             uint length = Read(stringLengthBits);
 
