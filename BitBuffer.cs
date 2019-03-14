@@ -117,6 +117,12 @@ namespace NetHelpers {
         }
 
         [MethodImpl(256)]
+        public void ResetReadPos() {
+            Finish();
+            bitsRead = 0;
+        }
+
+        [MethodImpl(256)]
         public void Add(int numBits, uint value) {
             Debug.Assert(numBits > 0, "Pushing negative bits");
             Debug.Assert(numBits <= 32, "Pushing too many bits");
