@@ -951,13 +951,11 @@ namespace NetHelpers {
             Add(stringLengthBits, (uint)length);
 
             if (codePage == 0)
-                for (int i = 0; i < length; i++)
-                {
+                for (int i = 0; i < length; i++){
                     Add(bitsASCII, value[i]);
                 }
             else if (codePage == 1)
-                for (int i = 0; i < length; i++)
-                {
+                for (int i = 0; i < length; i++){
                     Add(bitsLATIN1, value[i]);
                 }
             else if (codePage == 2)
@@ -965,15 +963,12 @@ namespace NetHelpers {
                     Add(bitsLATINEXT, value[i]);
                 }
             else if (codePage == 3)
-                for (int i = 0; i < length; i++)
-                {
-                    if (value[i] > 127)
-                    {
+                for (int i = 0; i < length; i++){
+                    if (value[i] > 127){
                         Add(1, 1);
                         Add(bitsUTF16, value[i]);
                     }
-                    else
-                    {
+                    else{
                         Add(1, 0);
                         Add(bitsASCII, value[i]);
                     }
@@ -1076,7 +1071,6 @@ namespace NetHelpers {
         public static int BitsRequired(uint min, uint max) {
             return (min == max) ? 1 : Log2(max - min) + 1;
         }
-
 
         public static int GetStringBitSize(string value, int length)
         {
