@@ -1011,7 +1011,7 @@ namespace NetHelpers {
         }
 
         public override string ToString() {
-            builder.Clear();
+            builder.Length = 0;
 
             for (int i = chunks.Length - 1; i >= 0; i--) {
                 builder.Append(Convert.ToString(chunks[i], 2).PadLeft(32, '0'));
