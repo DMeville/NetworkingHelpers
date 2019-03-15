@@ -1089,12 +1089,12 @@ namespace NetHelpers {
         }
 
         [MethodImpl(256)]
-        public void GetByteArray(ref byte[] outValue) {
-            GetByteArray(ref outValue, 0);
+        public void ReadByteArray(ref byte[] outValue) {
+            ReadByteArray(ref outValue, 0);
         }
 
         [MethodImpl(256)]
-        public void GetByteArray(ref byte[] outValue, int offset)
+        public void ReadByteArray(ref byte[] outValue, int offset)
         {
             Debug.Assert(outValue != null, "Supplied bytearray is null");
 
