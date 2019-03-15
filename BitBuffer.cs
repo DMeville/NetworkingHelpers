@@ -1089,16 +1089,23 @@ namespace NetHelpers {
         }
 
         [MethodImpl(256)]
-        public void ReadByteArray(ref byte[] outValue) {
-            ReadByteArray(ref outValue, 0);
+        public void ReadByteArray(ref byte[] outValue)
+        {
+            int length;
+            ReadByteArray(ref outValue, out length, 0);
         }
 
         [MethodImpl(256)]
-        public void ReadByteArray(ref byte[] outValue, int offset)
+        public void ReadByteArray(ref byte[] outValue, out int length) {
+            ReadByteArray(ref outValue, out length, 0);
+        }
+
+        [MethodImpl(256)]
+        public void ReadByteArray(ref byte[] outValue, out int length, int offset)
         {
             Debug.Assert(outValue != null, "Supplied bytearray is null");
 
-            var length = Read(byteArrLengthBits);
+            length = (int)Read(byteArrLengthBits);
 
             Debug.Assert(length < outValue.Length + offset, "The supplied byte array is too small for requested read");
 
