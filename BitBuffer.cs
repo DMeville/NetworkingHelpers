@@ -53,6 +53,8 @@ namespace NetHelpers {
         private const int defaultCapacity = 375; // 375 * 4 = 1500 bytes default MTU. don't have to grow.
         private const int stringLengthMax = 255;
         private const int stringLengthBits = 8;
+        private const int byteArrLengthMax = 511;
+        private const int byteArrLengthBits = 9;
         private const int bitsASCII = 7;
         private const int bitsLATIN1 = 8;
         private const int bitsLATINEXT = 9;
@@ -962,6 +964,7 @@ namespace NetHelpers {
         [MethodImpl(256)]
         public BitBuffer AddString(string value) {
             Debug.Assert(value != null, "String is null");
+            Debug.Assert(value.Length <= stringLengthMax, "String too long, raise the stringLengthMax value or split the string.");
 
             int length = value.Length;
             if (length > stringLengthMax)
@@ -1049,6 +1052,59 @@ namespace NetHelpers {
                 }
 
             return builder.ToString();
+        }
+
+        [MethodImpl(256)]
+        public BitBuffer AddByteArray(byte[] value) {
+            AddByteArray(value, 0, value.Length);
+
+            return this;
+        }
+
+        [MethodImpl(256)]
+        public BitBuffer AddByteArray(byte[] value, int length) {
+            AddByteArray(value, 0, length);
+            return this;
+        }
+
+        [MethodImpl(256)]
+        public BitBuffer AddByteArray(byte[] value, int offset, int length)
+        {
+            Debug.Assert(value != null, "Supplied bytearray is null");
+            Debug.Assert(length <= byteArrLengthMax, "Byte array too big, raise the byteArrLengthMax value or split the array.");
+
+            if (length > byteArrLengthMax)
+                length = byteArrLengthMax;
+
+            Debug.Assert(length + 9 <= (totalNumBits - bitsWriten), "Byte array too big for buffer.");
+
+            Add(byteArrLengthBits, (uint)length);
+
+            for (int index = offset; index < length; index++)
+            {
+                AddByte(value[index]);
+            }
+
+            return this;
+        }
+
+        [MethodImpl(256)]
+        public void GetByteArray(ref byte[] outValue) {
+            GetByteArray(ref outValue, 0);
+        }
+
+        [MethodImpl(256)]
+        public void GetByteArray(ref byte[] outValue, int offset)
+        {
+            Debug.Assert(outValue != null, "Supplied bytearray is null");
+
+            var length = Read(byteArrLengthBits);
+
+            Debug.Assert(length < outValue.Length + offset, "The supplied byte array is too small for requested read");
+
+            for (int index = offset; index < length; index++) {
+                outValue[index] = ReadByte();
+            }
         }
 
         public override string ToString() {
