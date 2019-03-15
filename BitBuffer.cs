@@ -80,7 +80,7 @@ namespace NetHelpers {
 
         public int Length {
             get {
-                return (bitsWriten >> 3) + 1;
+                return (bitsWriten - 1 >> 3) + 1;
             }
         }
 
