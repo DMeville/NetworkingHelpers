@@ -34,6 +34,11 @@ namespace NetHelpers {
             return shiftCount;
         }
 
+        public static int FindHighestBitPosition2(byte data)
+        {
+            return LogTable256[data];
+        }
+
         public static readonly int[] LogTable256 = new int[256]
         {
             0, 0, 1, 1, 2, 2, 2, 2, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5,
